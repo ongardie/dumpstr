@@ -1,0 +1,55 @@
+{% comment %}
+Copyright (c) 2011 Stanford University
+
+Permission to use, copy, modify, and distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR(S) DISCLAIM ALL
+WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES
+OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL AUTHORS BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+This template file provides the boilerplate and common elements
+throughout the site.
+{% endcomment %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}base.css" media="screen" />
+    <script type="text/javascript" src="{{ STATIC_URL }}jquery.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}ajax.js"></script>
+    <script>
+        WEBMETRICS = {}; // namespace
+        WEBMETRICS.STATIC_URL = "{{ STATIC_URL }}";
+        WEBMETRICS.WWW_ROOT = "{{ WWW_ROOT }}";
+        WEBMETRICS.PROJECT = "{{ PROJECT }}";
+    </script>
+    {% block head %}{% endblock %}
+    <title>{% block title %}{% endblock %}</title>
+</head>
+<body>
+
+    <div id="header">
+        <h2 id="branding">
+            WebMetrics
+            {% if PROJECT %}
+              for {{ PROJECT }}
+            {% endif %}
+        </h3>
+        <div id="user-tools">
+            <a href="{{ WWW_ROOT }}">Home</a>
+        </div>
+    </div>
+
+    <div id="content">
+        <div id="content-main">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+</body>
+</html>
