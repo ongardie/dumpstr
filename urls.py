@@ -17,6 +17,8 @@ prefix = '^%s' % settings.WWW_ROOT[1:]
 urlpatterns = patterns('',
     url(prefix + r'$',
         'webmetrics.views.home'),
+    url(prefix + r'report/(\d+)/?$',
+        'webmetrics.views.view_report'),
     url(prefix + r'ajax/report/new/?$',
         'webmetrics.views.post_report'),
 )

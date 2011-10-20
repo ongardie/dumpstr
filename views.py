@@ -16,6 +16,10 @@
 # This file contains the various views used in the webmetrics
 # application.
 
+from __future__ import division
+
+import datetime
+import itertools
 import json
 import re
 import time
@@ -55,6 +59,17 @@ def context_processor(request):
             'STATIC_URL': get_setting('STATIC_URL'),
             'PROJECT': get_setting('PROJECT')}
 
+def make_key(*components):
+    return '#'.join(components)
+
+def get_description(*components):
+    try:
+        descr = models.Description.objects.get(key=make_key(*components))
+    except models.Description.DoesNotExist:
+        return (components[-1], '')
+    else:
+        return (descr.label, descr.descr)
+
 # Regular views
 
 def home(request):
@@ -62,6 +77,87 @@ def home(request):
 
     return render_to_response('home.html',
                               {},
+                              RequestContext(request))
+
+def view_report(request, report_id):
+    """A detailed view of a report."""
+
+    ids = itertools.count()
+
+    report = models.Report.objects.get(id=int(report_id))
+    if report.data:
+        doc = json.loads(report.data)
+    else:
+        doc = []
+
+    sections = []
+    for section in doc:
+        lines = []
+        for line in section['lines']:
+            line_id = '%d' % next(ids)
+            raw_points = line['points']
+            if type(raw_points) is list:
+                if len(raw_points) == 0:
+                    continue
+                points = []
+                values = []
+                default_label_iter = itertools.count()
+                for point in raw_points:
+                    try:
+                        label, point = point
+                    except TypeError:
+                        label = str(default_label_iter.next())
+                    assert type(point) in [int, float]
+                    points.append((label, point))
+                    values.append(point)
+                range_ = max(values) - min(values)
+                avg = sum(values) / len(values)
+                if int(avg) == avg:
+                    text = '%d' % int(avg)
+                else:
+                    text = '%0.02f' % avg
+                if line['unit']:
+                    text += ' ' + line['unit']
+                if range_ > 0:
+                    text += ' avg'
+                json_points = json.dumps(points)
+                boring_graph = (range_ == 0)
+            else:
+                point = raw_points
+                if type(point) is float:
+                    text = '%0.02f' % point
+                elif type(point) is int:
+                    text = '%d' % point
+                else: # string
+                    text = point
+                if line['unit']:
+                    text += ' ' + line['unit']
+                json_points = 'null'
+                boring_graph = None
+            label, note = get_description(
+                            report.type,
+                            section['key'],
+                            line['key'])
+            lines.append({'id': line_id,
+                          # TODO 'indent_level': ' ' * line['key'].count(' '),
+                          'key': line['key'],
+                          'label': label,
+                          'note': note,
+                          'text': text,
+                          'json_points': json_points,
+                          'boring_graph': boring_graph,
+                          'unit': line['unit'],
+                         })
+        title, descr = get_description(
+                        report.type, section['key'])
+        sections.append({'key': section['key'],
+                         'title': title,
+                         'description': descr,
+                         'lines': lines})
+    return render_to_response('report.html',
+                              {'sections': sections,
+                               'report': report,
+                               'report_datetime': datetime.datetime.fromtimestamp(report.timestamp)},
                               RequestContext(request))
 
 # AJAX views

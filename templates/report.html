@@ -1,0 +1,357 @@
+{% extends "base.html" %}
+
+{% comment %}
+Copyright (c) 2011 Stanford University
+
+Permission to use, copy, modify, and distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR(S) DISCLAIM ALL
+WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES
+OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL AUTHORS BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+This is the template for the home page.
+{% endcomment %}
+
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}fancybox/jquery.fancybox.css" media="screen" />
+    <script type="text/javascript" src="{{ STATIC_URL }}flot/jquery.flot.js"></script> 
+    <script type="text/javascript" src="{{ STATIC_URL }}fancybox/jquery.fancybox.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}publisher.js"></script>
+
+<script type="text/javascript">
+
+// Returns a function which will enumerate the natural numbers.
+makeCounter = function () {
+    var counter = 0;
+    return function () {
+        counter += 1;
+        return counter - 1;
+    };
+};
+
+// Create and return an object to represent a section.
+createSection = function(key, label, description, lines) {
+    return {
+        key: key,
+        label: label,
+        description: description,
+        labelDescChanges: WEBMETRICS.createPublisher(),
+        lines: lines,
+    };
+};
+
+// Calculates some statistics (e.g., min, max, average) on the given data.
+calculateStats = function (data) {
+    if (data == null)
+        return null;
+    var min = data[0][1];
+    var max = data[0][1];
+    var total = 0;
+    for (pt in data) {
+        var v = data[pt][1];
+        total += v;
+        if (v < min)
+            min = v;
+        if (v > max)
+            max = v;
+    }
+    var avg = total / data.length;
+    return {length: data.length, min: min, max: max, avg: avg};
+};
+
+// Used internally by createLine to assign incrementing IDs.
+assignLineId = makeCounter();
+
+// Create and return an object to represent a line.
+createLine = function(key, label, description, text, data, unit) {
+    return {
+        id: assignLineId(),
+        key: key,
+        label: label,
+        description: description,
+        labelDescChanges: WEBMETRICS.createPublisher(),
+        text: text,
+        data: data,
+        unit: unit,
+        stats: calculateStats(data),
+    };
+};
+
+// Edit the label and description for something.
+// Pops up a dialog box with a form to edit the label and description of subject.
+// The argument subject should have the fields:
+//  - label: a single-line string
+//  - description: a multi-line string
+//  - labelDescChanges: a publisher (see WEBMETRICS.createPublisher) that is to
+//                      be called when the label and description have been changed.
+editDescriptionAction = function (subject) {
+    var form = $('#description_form')
+    var label_input = $(':input[name=label]', form);
+    var description_input = $(':input[name=description]', form);
+    label_input.val(subject.label);
+    description_input.val(subject.description);
+    $.fancybox({href: '#description_form',
+                transitionIn: 'none',
+                transitionOut: 'none',
+                overlayShow: false, // slow
+                centerOnScroll: true});
+    form.unbind('submit');
+    form.bind('submit', function() {
+        subject.label = label_input.val();
+        subject.description = description_input.val();
+        subject.labelDescChanges.publish();
+        $.fancybox.close();
+        return false;
+    });
+};
+
+// Draw the small graph shown in lines of a report.
+// line is the line object which contains the data to draw.
+// container is jquery selector for the HTML div to fill in.
+drawSmallGraph = function (line, container) {
+    // skip useless graphs
+    if (line.data == null || line.data.length < 2) {
+        container.html("");
+        return false;
+    }
+
+    var stats = line.stats;
+
+    // skip boring graphs but offer a link to the bigger graph
+    if (stats.min == stats.max) {
+        container.html('(<a href="#graph">boring graph</a>)');
+        return true;
+    }
+
+    // Set the unit label
+    $(".row-unit", container).html(line.unit);
+
+    // plot graph
+    var graph = $('.graph', container);
+    graph.width(50 + stats.length * 15);
+    graph.height(100);
+    $.plot(graph,
+        [
+         { data: line.data,
+           color: line.id % 5,
+           bars: {show: true},
+         },
+         { data: [[0, stats.avg], [stats.length, stats.avg]],
+           color: "#444",
+           lines: {show: true},
+           shadowSize: 0,
+         },
+        ],
+        { grid: {clickable: true},
+          xaxis: {show: false},
+          yaxis: {labelWidth: 40, min: 0},
+        });
+
+    return true;
+};
+
+// Draw the large graph shown in a popup.
+// line is the line object which contains the data to draw.
+showLargeGraph = function (line) {
+    var popup = $('#biggraph_popup');
+    var stats = line.stats;
+
+    // set title
+    $('h3', popup).html(line.label);
+    $('.unit', popup).html(line.unit);
+
+    // plot graph
+    $.plot($("#biggraph_graph"),
+        [
+         { data: line.data,
+           color: line.id % 5,
+           bars: {show: true},
+         },
+         { data: [[0, stats.avg], [stats.length, stats.avg]],
+           color: "#444",
+           lines: {show: true},
+           shadowsize: 0,
+         },
+        ],
+        { grid: {clickable: true},
+          yaxis: {labelwidth: 50, min: 0},
+        });
+};
+
+// Add a section to the page.
+// section is a section object.
+addSection = function(section) {
+    var sectionTemplate = $("#sectionTemplate").children();
+    var rowTemplate = $("#rowTemplate").children();
+
+    // Clone and add the section HTML template
+    var sectionHtml = sectionTemplate.clone();
+    $("#content-main").append(sectionHtml);
+
+    // Update the section label and descriptions when they change
+    section.labelDescChanges.subscribe(function () {
+        $('h2', sectionHtml).html(section.label);
+        $('.note span', sectionHtml).first().html(section.description);
+    });
+    // Also set them now
+    section.labelDescChanges.publish();
+    // And set the handler for the description edit link
+    $(".note a", sectionHtml).first().click(function() { editDescriptionAction(section); });
+
+    $.each(section.lines, function (i, line) {
+        // Clone and add the line HTML template. Append the row to the DOM
+        // early on so that the graph can have its width defined.
+        var row = rowTemplate.clone();
+        $("table", sectionHtml).append(row);
+
+        // Update the row label and descriptions when they change
+        line.labelDescChanges.subscribe(function () {
+            $(".label", row).html(line.label);
+            $(".note span", row).html(line.description);
+        });
+        // Also set them now
+        line.labelDescChanges.publish();
+        // And set the handler for the description edit link
+        $(".note a", row).click(function() { editDescriptionAction(line); });
+
+        // Fill in the remaining placeholders
+        $(".row-text", row).html(line.text);
+        drawSmallGraph(line, $(".row-graph", row));
+
+        // Set the handler for the big graph link (if it exists).
+        $(".row-graph a", row).click(function() {
+            $.fancybox({href: '#biggraph_popup',
+                        transitionIn: 'none',
+                        transitionOut: 'none',
+                        overlayShow: false, // slow
+                        centerOnScroll: true});
+            showLargeGraph(line);
+        });
+    });
+};
+
+// This code is generated from the details of the report
+// and calls addSection for each of the sections.
+{% for section in sections %}
+$(function() {
+    var lines = [];
+    {% for line in section.lines %}
+    lines.push(createLine("{{ line.key }}",
+                          "{{ line.label }}",
+                          "{{ line.note }}",
+                          "{{ line.text }}",
+                          {{ line.json_points|safe }},
+                          "{{ line.unit }}"));
+    {% endfor %}
+    addSection(createSection("{{ section.key }}",
+                             "{{ section.title }}",
+                             "{{ section.description }}",
+                             lines));
+});
+{% endfor %}
+
+// Make the table rows alternate colors.
+$(function() {
+    $(".striped tr:even").addClass("alt");
+});
+
+</script>
+{% endblock %}
+
+{% block title %}Report {{ report.id}}{% endblock %}
+
+{% block content %}
+
+<!--
+These divs are not shown directly. They are used by javascript either as templates
+that are cloned and filled in with real data, or as the content of popups.
+-->
+<div id="templates" style="display:none;">
+
+    <!-- This is the template used for each section. -->
+    <div id="sectionTemplate">
+        <div>
+            <h2>Title goes here</h2>
+            <div class="note extra">
+                <span>Description goes here</span>
+                <a href="#edit">edit</a>
+            </div>
+            <table class="striped">
+                <!-- Rows go here -->
+            </table>
+        </div>
+    </div>
+
+    <!-- This is the template used for each table row (line) within a section. -->
+    <table id="rowTemplate">
+        <tr>
+            <td style="min-width: 30em;">
+                <span class="label">Label goes here</span>
+                <br />
+                <div class="note extra" style="max-width: 25em">
+                    <span>Description goes here</span>
+                    <a href="#edit">edit</a>
+                </div>
+            </td>
+            <td class="row-text" style="text-align: right">Text goes here</td>
+            <td class="row-graph" style="text-align: right">
+                <span class="row-unit" style="float:left; margin: 50px 0 0 0">
+                    Unit goes here
+                </span>
+                <div style="float: left; margin: 20px auto">
+                    <div class="graph">Graph goes here</div>
+                </div>
+                <a style="float: left; margin: 100px 10px 0 10px" href="#graph">big</a>
+            </td>
+        </tr>
+    </table>
+
+    <!--
+    This is the form used in the popup to edit the labels and descriptions on
+    sections and lines.
+    -->
+    <div>
+        <form id="description_form" method="post" action="">{% csrf_token %}
+                Label:
+                <br />
+                <input type="text" name="label" size="50" />
+                <br />
+                Description:
+                <br />
+                <textarea style="width: 35em; height: 30eX;" name="description"></textarea>
+                <br />
+                <input type="submit" value="Save" />
+            </p>
+        </form>
+    </div>
+
+    <!-- This is the popup in which large graphs are displayed. -->
+    <div>
+        <div id="biggraph_popup" style="width: 550px; height: 600px">
+            <h3 style="text-align: center">Title goes here</h3>
+            <div style="float:left; margin: 250px 0 0 0" class="unit">Unit goes here</div>
+            <div id="biggraph_graph" style="width: 500px; height: 500px; margin: 20px auto;"></div>
+        </div>
+    </div>
+
+</div>
+
+<!-- The actual content starts here. -->
+
+<h1>Report {{ report.id }}</h1>
+
+<ul>
+<li>Type: {{ report.type|default:"N/A" }}</li>
+<li>Owner: {{ report.owner|default:"N/A" }}</li>
+<li>Created: {{ report_datetime|date:"Y-m-d H:i:s" }}</li>
+</ul>
+
+<!-- Javascript fills in the rest of the page. -->
+
+{% endblock %}
