@@ -11,6 +11,12 @@ if settings.DEBUG and hasattr(settings, 'STATIC_DOC_ROOT'):
              'show_indexes': True})
     )
 
-urlpatterns += patterns('',
-    url('^.*$', 'webmetrics.views.home'),
+assert settings.WWW_ROOT.startswith('/')
+prefix = '^%s' % settings.WWW_ROOT[1:]
+
+urlpatterns = patterns('',
+    url(prefix + r'$',
+        'webmetrics.views.home'),
+    url(prefix + r'ajax/report/new/?$',
+        'webmetrics.views.post_report'),
 )

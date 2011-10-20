@@ -21,6 +21,9 @@ class Report(models.Model):
     """Users submit reports consiting of measurements that they have collected
     for a particular event."""
 
+    # The human-readable type of the event that was measured.
+    type = models.CharField(max_length=65535)
+
     # The name of the user who submitted the report.
     owner = models.CharField(max_length=65535)
 
