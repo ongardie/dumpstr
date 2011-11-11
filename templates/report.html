@@ -22,6 +22,7 @@ This is the template for the home page.
     <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}fancybox/jquery.fancybox.css" media="screen" />
     <script type="text/javascript" src="{{ STATIC_URL }}flot/jquery.flot.js"></script> 
     <script type="text/javascript" src="{{ STATIC_URL }}fancybox/jquery.fancybox.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}jquery.cookie.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}publisher.js"></script>
 
 <script type="text/javascript">
@@ -33,6 +34,33 @@ makeCounter = function () {
         counter += 1;
         return counter - 1;
     };
+};
+
+// Create a toggle button.
+// button is the HTML element that is toggled.
+// initialValue is a boolean describing the starting state of the button.
+// trueLabel is the label to be shown on the button when its value is true.
+// falseLabel is the label to be shown on the button when its value is false.
+// Returns an object with the following fields:
+//  - get is a function that returns the value
+//  - toggle is a function that inverts the value
+//  - changes is a publisher object that is called after the value changes
+var makeToggle = function(button, initialValue, trueLabel, falseLabel) {
+    var value = initialValue;
+    var that = {};
+    that.changes = WEBMETRICS.createPublisher();
+    that.get = function () { return value; };
+    that.toggle = function () { value = !value; that.changes.publish(); }
+    var relabel = function() {
+        if (value)
+            button.val(trueLabel);
+        else
+            button.val(falseLabel);
+    };
+    relabel();
+    that.changes.subscribe(relabel);
+    button.click(that.toggle);
+    return that;
 };
 
 // Create and return an object to represent a section.
@@ -261,6 +289,17 @@ $(function() {
     $(".striped tr:even").addClass("alt");
 });
 
+// Set up the compact/expand toggle button, and tie it to a cookie.
+$(function() {
+    var prev = $.cookie('compact_reports') == "true";
+    var compact = makeToggle($('#compact'), prev, 'expand', 'compact');
+    compact.changes.subscribe(function () {
+        $.cookie('compact_reports', compact.get(), { expires: 365 });
+        $('.extra').toggle(!compact.get());
+    });
+    $('.extra').toggle(!compact.get());
+});
+
 </script>
 {% endblock %}
 
@@ -300,7 +339,7 @@ that are cloned and filled in with real data, or as the content of popups.
                 </div>
             </td>
             <td class="row-text" style="text-align: right">Text goes here</td>
-            <td class="row-graph" style="text-align: right">
+            <td class="row-graph extra" style="text-align: right">
                 <span class="row-unit" style="float:left; margin: 50px 0 0 0">
                     Unit goes here
                 </span>
@@ -343,6 +382,8 @@ that are cloned and filled in with real data, or as the content of popups.
 </div>
 
 <!-- The actual content starts here. -->
+
+<input type="button" id="compact" style="float: right" />
 
 <h1>Report {{ report.id }}</h1>
 
