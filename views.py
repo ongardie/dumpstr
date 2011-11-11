@@ -140,7 +140,8 @@ def view_report(request, report_id):
                             line['key'])
             lines.append({'id': line_id,
                           # TODO 'indent_level': ' ' * line['key'].count(' '),
-                          'key': line['key'],
+                          'key': make_key(report.type, section['key'],
+                                          line['key']),
                           'label': label,
                           'note': note,
                           'text': text,
@@ -150,7 +151,7 @@ def view_report(request, report_id):
                          })
         title, descr = get_description(
                         report.type, section['key'])
-        sections.append({'key': section['key'],
+        sections.append({'key': make_key(report.type, section['key']),
                          'title': title,
                          'description': descr,
                          'lines': lines})
@@ -161,6 +162,18 @@ def view_report(request, report_id):
                               RequestContext(request))
 
 # AJAX views
+
+def post_description(request):
+    """Called to save labels and descriptions."""
+
+    if request.method != 'POST':
+        return http.HttpResponse('Status 405: Method Not Allowed',
+                                 status=405)
+    descr = models.Description(key=request.POST['key'],
+                               label=request.POST['label'],
+                               descr=request.POST['description'])
+    descr.save()
+    return http.HttpResponse()
 
 @csrf_exempt
 @transaction.commit_manually

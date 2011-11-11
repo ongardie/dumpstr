@@ -134,7 +134,18 @@ editDescriptionAction = function (subject) {
         subject.label = label_input.val();
         subject.description = description_input.val();
         subject.labelDescChanges.publish();
-        $.fancybox.close();
+        $.fancybox.showActivity();
+        $.ajax({
+            type: 'POST',
+            cache: false,
+            url: '{{ WWW_ROOT }}ajax/description/save/',
+            data: {
+                key: subject.key,
+                label: subject.label,
+                description: subject.description,
+            },
+            success: function(data) { $.fancybox.close(); },
+        });
         return false;
     });
 };

@@ -21,4 +21,6 @@ urlpatterns = patterns('',
         'webmetrics.views.view_report'),
     url(prefix + r'ajax/report/new/?$',
         'webmetrics.views.post_report'),
+    url(prefix + r'ajax/description/save/?$',
+        'webmetrics.views.post_description'),
 )
