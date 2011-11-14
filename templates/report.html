@@ -252,12 +252,12 @@ addSection = function(section) {
     // Update the section label and descriptions when they change
     section.labelDescChanges.subscribe(function () {
         $('h2', sectionHtml).html(section.label);
-        $('.note span', sectionHtml).first().html(section.description);
+        $('.quiet span', sectionHtml).first().html(section.description);
     });
     // Also set them now
     section.labelDescChanges.publish();
     // And set the handler for the description edit link
-    $(".note a", sectionHtml).first().click(function() { editDescriptionAction(section); });
+    $(".quiet a", sectionHtml).first().click(function() { editDescriptionAction(section); });
 
     $.each(section.lines, function (i, line) {
         // Clone and add the line HTML template. Append the row to the DOM
@@ -268,12 +268,12 @@ addSection = function(section) {
         // Update the row label and descriptions when they change
         line.labelDescChanges.subscribe(function () {
             $(".label", row).html(line.label);
-            $(".note span", row).html(line.description);
+            $(".quiet span", row).html(line.description);
         });
         // Also set them now
         line.labelDescChanges.publish();
         // And set the handler for the description edit link
-        $(".note a", row).click(function() { editDescriptionAction(line); });
+        $(".quiet a", row).click(function() { editDescriptionAction(line); });
 
         // Fill in the remaining placeholders
         $(".row-text", row).html(line.text);
@@ -344,7 +344,7 @@ that are cloned and filled in with real data, or as the content of popups.
     <div id="sectionTemplate">
         <div>
             <h2>Title goes here</h2>
-            <div class="note extra">
+            <div class="quiet extra">
                 <span>Description goes here</span>
                 <a href="#edit">edit</a>
             </div>
@@ -360,7 +360,7 @@ that are cloned and filled in with real data, or as the content of popups.
             <td style="min-width: 30em;">
                 <span class="label">Label goes here</span>
                 <br />
-                <div class="note extra" style="max-width: 25em">
+                <div class="quiet extra" style="max-width: 25em">
                     <span>Description goes here</span>
                     <a href="#edit">edit</a>
                 </div>
