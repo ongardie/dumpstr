@@ -10,7 +10,7 @@ WEBMETRICS.createPublisher = function() {
             delete subscribers[id];
         },
         publish: function() {
-            for (idx in subscribers) {
+            for (var idx in subscribers) {
                 var callback = subscribers[idx];
                 callback();
             }

@@ -81,7 +81,7 @@ calculateStats = function (data) {
     var min = data[0][1];
     var max = data[0][1];
     var total = 0;
-    for (pt in data) {
+    for (var pt in data) {
         var v = data[pt][1];
         total += v;
         if (v < min)
@@ -171,6 +171,12 @@ drawSmallGraph = function (line, container) {
     // Set the unit label
     $(".row-unit", container).html(line.unit);
 
+    // unpack data array
+    var points = [];
+    for (var i in line.data) {
+        points.push([i, line.data[i][1]]);
+    }
+
     // plot graph
     var graph = $('.graph', container);
     graph.width(50 + stats.length * 15);
@@ -188,7 +194,7 @@ drawSmallGraph = function (line, container) {
          },
         ],
         { grid: {clickable: true},
-          xaxis: {show: false},
+          xaxis: {ticks: []},
           yaxis: {labelWidth: 40, min: 0},
         });
 
@@ -205,10 +211,19 @@ showLargeGraph = function (line) {
     $('h3', popup).html(line.label);
     $('.unit', popup).html(line.unit);
 
+    // unpack data array
+    var labels = [];
+    var points = [];
+    for (var i in line.data) {
+        i = Number(i); // I'm not sure why this is necessary
+        labels.push([i + 0.5, String(line.data[i][0])]);
+        points.push([i, line.data[i][1]]);
+    }
+
     // plot graph
     $.plot($("#biggraph_graph"),
         [
-         { data: line.data,
+         { data: points,
            color: line.id % 5,
            bars: {show: true},
          },
@@ -219,6 +234,7 @@ showLargeGraph = function (line) {
          },
         ],
         { grid: {clickable: true},
+          xaxis: {ticks: labels},
           yaxis: {labelwidth: 50, min: 0},
         });
 };
