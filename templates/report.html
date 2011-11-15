@@ -183,7 +183,7 @@ drawSmallGraph = function (line, container) {
     graph.height(100);
     $.plot(graph,
         [
-         { data: line.data,
+         { data: points,
            color: line.id % 5,
            bars: {show: true},
          },
