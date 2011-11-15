@@ -313,14 +313,14 @@ $(function() {
     {% for line in section.lines %}
     lines.push(createLine("{{ line.key }}",
                           "{{ line.label }}",
-                          "{{ line.note }}",
+                          {{ line.json_note|safe }},
                           {{ line.json_summary|safe }},
                           {{ line.json_points|safe }},
                           "{{ line.unit }}"));
     {% endfor %}
     addSection(createSection("{{ section.key }}",
                              "{{ section.title }}",
-                             "{{ section.description }}",
+                             {{ section.json_description|safe }},
                              lines));
 });
 {% endfor %}

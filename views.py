@@ -121,7 +121,10 @@ def view_report(request, report_id):
                           'key': make_key(report.type, section['key'],
                                           line['key']),
                           'label': label,
-                          'note': note,
+
+                          # json handles multi-line strings
+                          'json_note': json.dumps(note),
+
                           'json_summary': json.dumps(line['summary']),
                           'json_points': json_points,
                           'unit': line['unit'],
@@ -130,7 +133,10 @@ def view_report(request, report_id):
                         report.type, section['key'])
         sections.append({'key': make_key(report.type, section['key']),
                          'title': title,
-                         'description': descr,
+
+                          # json handles multi-line strings
+                         'json_description': json.dumps(descr),
+
                          'lines': lines})
     return render_to_response('report.html',
                               {'sections': sections,
