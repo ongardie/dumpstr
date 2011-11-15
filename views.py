@@ -100,7 +100,6 @@ def view_report(request, report_id):
                 if len(raw_points) == 0:
                     continue
                 points = []
-                values = []
                 default_label_iter = itertools.count()
                 for point in raw_points:
                     try:
@@ -109,31 +108,10 @@ def view_report(request, report_id):
                         label = str(default_label_iter.next())
                     assert type(point) in [int, float]
                     points.append((label, point))
-                    values.append(point)
-                range_ = max(values) - min(values)
-                avg = sum(values) / len(values)
-                if int(avg) == avg:
-                    text = '%d' % int(avg)
-                else:
-                    text = '%0.02f' % avg
-                if line['unit']:
-                    text += ' ' + line['unit']
-                if range_ > 0:
-                    text += ' avg'
                 json_points = json.dumps(points)
-                boring_graph = (range_ == 0)
             else:
                 point = raw_points
-                if type(point) is float:
-                    text = '%0.02f' % point
-                elif type(point) is int:
-                    text = '%d' % point
-                else: # string
-                    text = point
-                if line['unit']:
-                    text += ' ' + line['unit']
                 json_points = 'null'
-                boring_graph = None
             label, note = get_description(
                             report.type,
                             section['key'],
@@ -144,9 +122,8 @@ def view_report(request, report_id):
                                           line['key']),
                           'label': label,
                           'note': note,
-                          'text': text,
+                          'json_summary': json.dumps(line['summary']),
                           'json_points': json_points,
-                          'boring_graph': boring_graph,
                           'unit': line['unit'],
                          })
         title, descr = get_description(

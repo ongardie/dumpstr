@@ -97,14 +97,14 @@ calculateStats = function (data) {
 assignLineId = makeCounter();
 
 // Create and return an object to represent a line.
-createLine = function(key, label, description, text, data, unit) {
+createLine = function(key, label, description, summary, data, unit) {
     return {
         id: assignLineId(),
         key: key,
         label: label,
         description: description,
         labelDescChanges: WEBMETRICS.createPublisher(),
-        text: text,
+        summary: summary,
         data: data,
         unit: unit,
         stats: calculateStats(data),
@@ -241,7 +241,9 @@ showLargeGraph = function (line) {
 
 // Add a section to the page.
 // section is a section object.
+sections = [];
 addSection = function(section) {
+    sections.push(section);
     var sectionTemplate = $("#sectionTemplate").children();
     var rowTemplate = $("#rowTemplate").children();
 
@@ -276,7 +278,19 @@ addSection = function(section) {
         $(".quiet a", row).click(function() { editDescriptionAction(line); });
 
         // Fill in the remaining placeholders
-        $(".row-text", row).html(line.text);
+        var summaryHtml;
+        if ($.isArray(line.summary)) {
+            summaryHtml = '';
+            for (var i in line.summary) {
+                summaryHtml += '<pre class="summary">';
+                if (i != 0)
+                    summaryHtml += '<span class="divider"></span>';
+                summaryHtml += line.summary[i] + '</pre>';
+            }
+        } else {
+            summaryHtml = '<pre class="summary">' + line.summary + '</pre>';
+        }
+        $(".row-text", row).html(summaryHtml);
         drawSmallGraph(line, $(".row-graph", row));
 
         // Set the handler for the big graph link (if it exists).
@@ -300,7 +314,7 @@ $(function() {
     lines.push(createLine("{{ line.key }}",
                           "{{ line.label }}",
                           "{{ line.note }}",
-                          "{{ line.text }}",
+                          {{ line.json_summary|safe }},
                           {{ line.json_points|safe }},
                           "{{ line.unit }}"));
     {% endfor %}
@@ -320,11 +334,21 @@ $(function() {
 $(function() {
     var prev = $.cookie('compact_reports') == "true";
     var compact = makeToggle($('#compact'), prev, 'expand', 'compact');
-    compact.changes.subscribe(function () {
-        $.cookie('compact_reports', compact.get(), { expires: 365 });
+    var updateDisplay = function () {
         $('.extra').toggle(!compact.get());
+        if (compact.get()) {
+            $('.summary').css('display', 'inline');
+            $('.summary .divider').html(' / ');
+        } else {
+            $('.summary').css('display', 'block');
+            $('.summary .divider').html('');
+        }
+    };
+    updateDisplay();
+    compact.changes.subscribe(function() {
+        $.cookie('compact_reports', compact.get(), { expires: 365 });
+        updateDisplay();
     });
-    $('.extra').toggle(!compact.get());
 });
 
 </script>
