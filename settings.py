@@ -53,6 +53,9 @@ LOGGING = {
 # must have trailing and leading slash
 WWW_ROOT = '/'
 
+# the trend IDs of trends shown on the home page
+HOME_TRENDS = ['test']
+
 try:
     from local_settings import *
 except:

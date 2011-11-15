@@ -19,12 +19,6 @@ This is the template for the home page.
 {% endcomment %}
 
 {% block head %}
-    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}fancybox/jquery.fancybox.css" media="screen" />
-    <script type="text/javascript" src="{{ STATIC_URL }}flot/jquery.flot.js"></script> 
-    <script type="text/javascript" src="{{ STATIC_URL }}fancybox/jquery.fancybox.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}jquery.cookie.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}publisher.js"></script>
-
 <script type="text/javascript">
 
 // Returns a function which will enumerate the natural numbers.
@@ -109,45 +103,6 @@ createLine = function(key, label, description, summary, data, unit) {
         unit: unit,
         stats: calculateStats(data),
     };
-};
-
-// Edit the label and description for something.
-// Pops up a dialog box with a form to edit the label and description of subject.
-// The argument subject should have the fields:
-//  - label: a single-line string
-//  - description: a multi-line string
-//  - labelDescChanges: a publisher (see WEBMETRICS.createPublisher) that is to
-//                      be called when the label and description have been changed.
-editDescriptionAction = function (subject) {
-    var form = $('#description_form')
-    var label_input = $(':input[name=label]', form);
-    var description_input = $(':input[name=description]', form);
-    label_input.val(subject.label);
-    description_input.val(subject.description);
-    $.fancybox({href: '#description_form',
-                transitionIn: 'none',
-                transitionOut: 'none',
-                overlayShow: false, // slow
-                centerOnScroll: true});
-    form.unbind('submit');
-    form.bind('submit', function() {
-        subject.label = label_input.val();
-        subject.description = description_input.val();
-        subject.labelDescChanges.publish();
-        $.fancybox.showActivity();
-        $.ajax({
-            type: 'POST',
-            cache: false,
-            url: '{{ WWW_ROOT }}ajax/description/save/',
-            data: {
-                key: subject.key,
-                label: subject.label,
-                description: subject.description,
-            },
-            success: function(data) { $.fancybox.close(); },
-        });
-        return false;
-    });
 };
 
 // Draw the small graph shown in lines of a report.
@@ -259,7 +214,9 @@ addSection = function(section) {
     // Also set them now
     section.labelDescChanges.publish();
     // And set the handler for the description edit link
-    $(".quiet a", sectionHtml).first().click(function() { editDescriptionAction(section); });
+    $(".quiet a", sectionHtml).first().click(function() {
+        WEBMETRICS.editDescriptionAction(section);
+    });
 
     $.each(section.lines, function (i, line) {
         // Clone and add the line HTML template. Append the row to the DOM
@@ -275,7 +232,9 @@ addSection = function(section) {
         // Also set them now
         line.labelDescChanges.publish();
         // And set the handler for the description edit link
-        $(".quiet a", row).click(function() { editDescriptionAction(line); });
+        $(".quiet a", row).click(function() {
+            WEBMETRICS.editDescriptionAction(line);
+        });
 
         // Fill in the remaining placeholders
         var summaryHtml;
@@ -356,6 +315,17 @@ $(function() {
     });
 });
 
+$(function () {
+    var container = $('#trendgraphs');
+    {% for trend in trends %}
+    WEBMETRICS.addTrendGraph(container,
+                             '{{ trend.id }}',
+                             '{{ trend.key }}',
+                             '{{ trend.label }}',
+                             {{ trend.json_description|safe }});
+    {% endfor %}
+});
+
 </script>
 {% endblock %}
 
@@ -407,25 +377,6 @@ that are cloned and filled in with real data, or as the content of popups.
         </tr>
     </table>
 
-    <!--
-    This is the form used in the popup to edit the labels and descriptions on
-    sections and lines.
-    -->
-    <div>
-        <form id="description_form" method="post" action="">{% csrf_token %}
-                Label:
-                <br />
-                <input type="text" name="label" size="50" />
-                <br />
-                Description:
-                <br />
-                <textarea style="width: 35em; height: 30eX;" name="description"></textarea>
-                <br />
-                <input type="submit" value="Save" />
-            </p>
-        </form>
-    </div>
-
     <!-- This is the popup in which large graphs are displayed. -->
     <div>
         <div id="biggraph_popup" style="width: 600px; height: 600px">
@@ -448,6 +399,11 @@ that are cloned and filled in with real data, or as the content of popups.
 <li>Owner: {{ report.owner|default:"N/A" }}</li>
 <li>Created: {{ report_datetime|date:"Y-m-d H:i:s" }}</li>
 </ul>
+
+{% if trends %}
+<h2>Trends</h2>
+<div id="trendgraphs"></div>
+{% endif %}
 
 <!-- Javascript fills in the rest of the page. -->
 

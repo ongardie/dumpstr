@@ -70,13 +70,31 @@ def get_description(*components):
     else:
         return (descr.label, descr.descr)
 
+def get_trends(trend_ids):
+    """Given a list of trend_ids, return a list of trend objects for templates
+    to use."""
+    trends = []
+    for trend_id in trend_ids:
+        label, desc = get_description('trend', trend_id)
+        trends.append({
+            'id': trend_id,
+            'key': make_key('trend', trend_id),
+            'label': label,
+            'description': desc,
+            # json handles multi-line strings
+            'json_description': json.dumps(desc),
+        })
+    return trends
+
+
 # Regular views
 
 def home(request):
     """The view that is called on the front page of the application."""
 
     return render_to_response('home.html',
-                              {},
+                              {'trends': get_trends(
+                                    get_setting('HOME_TRENDS', ['test']))},
                               RequestContext(request))
 
 def view_report(request, report_id):
@@ -89,6 +107,11 @@ def view_report(request, report_id):
         doc = json.loads(report.data)
     else:
         doc = []
+    if report.trends:
+        trend_ids = [trend_id for trend_id, value in json.loads(report.trends)]
+        trends = get_trends(trend_ids)
+    else:
+        trends = []
 
     sections = []
     for section in doc:
@@ -141,7 +164,9 @@ def view_report(request, report_id):
     return render_to_response('report.html',
                               {'sections': sections,
                                'report': report,
-                               'report_datetime': datetime.datetime.fromtimestamp(report.timestamp)},
+                               'report_datetime': datetime.datetime.fromtimestamp(report.timestamp),
+                               'trends': trends},
+
                               RequestContext(request))
 
 def view_latest_report(request):
@@ -215,3 +240,43 @@ def post_report(request):
     else:
         transaction.commit()
         return http.HttpResponse(report.id)
+
+def get_trend(request, trend_id):
+    """Returns the data for a trend graph."""
+
+    start = None
+    end = None
+    if 'from' in request.GET and 'to' in request.GET:
+        start = float(request.GET['from'])
+        end = float(request.GET['to'])
+
+    cursor = connection.cursor()
+    table = make_trend_table_name(trend_id)
+
+    if start is None:
+        cursor.execute('SELECT COUNT(*) FROM ' + table)
+    else:
+        cursor.execute('SELECT COUNT(*) FROM ' + table +
+                       ' WHERE id >= %s AND id <= %s',
+                       [start, end])
+
+    num_lines = cursor.fetchone()[0]
+    skip_per_point = max(num_lines // 1000 - 1, 1)
+
+    if start is None:
+        cursor.execute('SELECT id, point, timestamp, report_id'
+                       ' FROM ' + table +
+                       ' WHERE id %% %s == 0'
+                       ' ORDER BY id',
+                       [skip_per_point])
+    else:
+        cursor.execute('SELECT id, point, timestamp, report_id'
+                       ' FROM ' + table +
+                       ' WHERE id >= %s AND id <= %s'
+                       ' AND id %% %s == 0'
+                       ' ORDER BY id',
+                       [start, end, skip_per_point])
+    trend = cursor.fetchall()
+    response = json.dumps(trend)
+
+    return http.HttpResponse(response)

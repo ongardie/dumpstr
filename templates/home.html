@@ -20,6 +20,24 @@ This is the template for the home page.
 
 {% block title %}Home{% endblock %}
 
+{% block head %}
+<script>
+$(function () {
+    var container = $('#trendgraphs');
+    {% for trend in trends %}
+    WEBMETRICS.addTrendGraph(container, 
+                             '{{ trend.id }}',
+                             '{{ trend.key }}',
+                             '{{ trend.label }}',
+                             {{ trend.json_description|safe }});
+    {% endfor %}
+});
+</script>
+{% endblock %}
+
 {% block content %}
-Hello, world!
+
+<h2>Trends</h2>
+<div id="trendgraphs"></div>
+
 {% endblock %}

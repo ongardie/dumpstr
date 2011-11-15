@@ -25,4 +25,6 @@ urlpatterns = patterns('',
         'webmetrics.views.post_report'),
     url(prefix + r'ajax/description/save/?$',
         'webmetrics.views.post_description'),
+    url(prefix + r'ajax/trend/([A-Za-z0-9_]+)/?$',
+        'webmetrics.views.get_trend'),
 )

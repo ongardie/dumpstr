@@ -20,14 +20,27 @@ throughout the site.
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
     <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}base.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}fancybox/jquery.fancybox.css" media="screen" />
+
     <script type="text/javascript" src="{{ STATIC_URL }}jquery.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}ajax.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}flot/jquery.flot.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}flot/jquery.flot.selection.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}fancybox/jquery.fancybox.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}jquery.cookie.js"></script>
+
+    {# The ordering for these javascript snippets and files is important and fragile. #}
     <script>
         WEBMETRICS = {}; // namespace
         WEBMETRICS.STATIC_URL = "{{ STATIC_URL }}";
         WEBMETRICS.WWW_ROOT = "{{ WWW_ROOT }}";
         WEBMETRICS.PROJECT = "{{ PROJECT }}";
     </script>
+    <script type="text/javascript" src="{{ STATIC_URL }}publisher.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}staticresources.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}description.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}trend.js"></script>
+
     {% block head %}{% endblock %}
     <title>{% block title %}{% endblock %}</title>
 </head>
