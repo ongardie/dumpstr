@@ -295,6 +295,11 @@ addSection = function(section) {
 
         // Set the handler for the big graph link (if it exists).
         $(".row-graph a", row).click(function() {
+
+            // This seems to be necessary to open up a big graph while another
+            // one is already being displayed.
+            $.fancybox.close();
+
             $.fancybox({href: '#biggraph_popup',
                         transitionIn: 'none',
                         transitionOut: 'none',
