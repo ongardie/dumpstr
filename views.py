@@ -144,6 +144,11 @@ def view_report(request, report_id):
                                'report_datetime': datetime.datetime.fromtimestamp(report.timestamp)},
                               RequestContext(request))
 
+def view_latest_report(request):
+    latest_id = models.Report.objects.values('id').order_by('-id')[0]['id']
+    return view_report(request, latest_id)
+
+
 # AJAX views
 
 def post_description(request):
