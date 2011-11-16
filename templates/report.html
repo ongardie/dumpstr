@@ -296,6 +296,20 @@ $(function() {
 
 // Set up the compact/expand toggle button, and tie it to a cookie.
 $(function() {
+    var trendGraphsAdded = false;
+    // Adds the trend graphs to the DOM.
+    var addTrendGraphs = function () {
+        trendGraphsAdded = true;
+        var container = $('#trendgraphs');
+        {% for trend in trends %}
+        WEBMETRICS.addTrendGraph(container,
+                                 '{{ trend.id }}',
+                                 '{{ trend.key }}',
+                                 '{{ trend.label }}',
+                                 {{ trend.json_description|safe }});
+        {% endfor %}
+    };
+
     var prev = $.cookie('compact_reports') == "true";
     var compact = makeToggle($('#compact'), prev, 'expand', 'compact');
     var updateDisplay = function () {
@@ -307,23 +321,17 @@ $(function() {
             $('.summary').css('display', 'block');
             $('.summary .divider').html('');
         }
+        // We can't add trend graphs while in compact mode because they must
+        // have a width and height. Defer it until the first time showing
+        // expanded mode.
+        if (!compact.get() && !trendGraphsAdded)
+            addTrendGraphs();
     };
     updateDisplay();
     compact.changes.subscribe(function() {
         $.cookie('compact_reports', compact.get(), { expires: 365 });
         updateDisplay();
     });
-});
-
-$(function () {
-    var container = $('#trendgraphs');
-    {% for trend in trends %}
-    WEBMETRICS.addTrendGraph(container,
-                             '{{ trend.id }}',
-                             '{{ trend.key }}',
-                             '{{ trend.label }}',
-                             {{ trend.json_description|safe }});
-    {% endfor %}
 });
 
 </script>
@@ -400,10 +408,12 @@ that are cloned and filled in with real data, or as the content of popups.
 <li>Created: {{ report_datetime|date:"Y-m-d H:i:s" }}</li>
 </ul>
 
+<div class="extra">
 {% if trends %}
 <h2>Trends</h2>
 <div id="trendgraphs"></div>
 {% endif %}
+</div>
 
 <!-- Javascript fills in the rest of the page. -->
 
