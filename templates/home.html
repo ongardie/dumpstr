@@ -37,7 +37,20 @@ $(function () {
 
 {% block content %}
 
-<h2>Trends</h2>
+<h1>Latest Reports</h1>
+<ul>
+<li>
+    <a href="{{ WWW_ROOT }}report/latest">Latest report</a>:
+    this URL will always refer to the latest report
+</li>
+{% for report in latest_reports %}
+<li>Report <a href="{{ WWW_ROOT }}report/{{ report.id }}">{{ report.id }}</a>:
+    {{ report.owner }} on {{ report.type }}
+</li>
+{% endfor %}
+</ul>
+
+<h1>Trends</h1>
 <div id="trendgraphs"></div>
 
 {% endblock %}

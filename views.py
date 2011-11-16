@@ -54,10 +54,19 @@ def context_processor(request):
     """Called when each RequestContext is created to create common
     variables for templates."""
 
-    context = {}
-    return {'WWW_ROOT': get_setting('WWW_ROOT'),
-            'STATIC_URL': get_setting('STATIC_URL'),
-            'PROJECT': get_setting('PROJECT')}
+    latest_reports = (models.Report.objects.values('id', 'owner', 'type')
+                        .order_by('-id')[:10])
+    try:
+        latest_report = latest_reports[0]
+    except IndexError:
+        latest_report = None
+    return {
+        'WWW_ROOT': get_setting('WWW_ROOT'),
+        'STATIC_URL': get_setting('STATIC_URL'),
+        'PROJECT': get_setting('PROJECT'),
+        'latest_reports': latest_reports,
+        'latest_report': latest_report,
+    }
 
 def make_key(*components):
     return '#'.join(components)

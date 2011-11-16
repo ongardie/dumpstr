@@ -35,6 +35,13 @@ throughout the site.
         WEBMETRICS.STATIC_URL = "{{ STATIC_URL }}";
         WEBMETRICS.WWW_ROOT = "{{ WWW_ROOT }}";
         WEBMETRICS.PROJECT = "{{ PROJECT }}";
+        $(function() {
+            $('#view_report').click(function() {
+                var id = $('#view_id').val();
+                window.location = "{{ WWW_ROOT }}report/" + id;
+                return false;
+            });
+        });
     </script>
     <script type="text/javascript" src="{{ STATIC_URL }}publisher.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}staticresources.js"></script>
@@ -50,11 +57,20 @@ throughout the site.
         <h2 id="branding">
             WebMetrics
             {% if PROJECT %}
-              for {{ PROJECT }}
+              for {{ PROJECT|safe }}
             {% endif %}
         </h3>
         <div id="user-tools">
             <a href="{{ WWW_ROOT }}">Home</a>
+            |
+
+            <form style="display:inline;">
+                View report:
+                <input type="text" name="id" id="view_id"
+                       style="width: 4em" value="{{ latest_report.id }}" />
+                <input type="submit" id="view_report" value="Go" />
+            </form>
+
         </div>
     </div>
 
