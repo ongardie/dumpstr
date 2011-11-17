@@ -115,6 +115,7 @@ WEBMETRICS.createTrend = function (trendId, placeholder, back, pointInfo) {
                  selection: { mode: "x" },
                  grid: {clickable: showPoints},
                });
+        back.attr('disabled', zooms.length == 0);
     };
 
     var refetch = function () {
@@ -130,7 +131,7 @@ WEBMETRICS.createTrend = function (trendId, placeholder, back, pointInfo) {
             data: requestData,
             dataType: 'json',
             success: function (newData) {
-                if (newData.length > 3 || zooms.length <= 1) {
+                if (newData.length > 3 || zooms.length < 1) {
                     data = newData;
                     redraw();
                 } else {
