@@ -73,8 +73,9 @@ def make_key(*components):
 
 def get_description(*components):
     try:
-        descr = models.Description.objects.get(key=make_key(*components))
-    except models.Description.DoesNotExist:
+        descr = (models.Description.objects.filter(key=make_key(*components))
+                    .order_by('-id')[0])
+    except IndexError:
         return (components[-1], '')
     else:
         return (descr.label, descr.descr)
@@ -191,6 +192,9 @@ def post_description(request):
     if request.method != 'POST':
         return http.HttpResponse('Status 405: Method Not Allowed',
                                  status=405)
+    # This intentionally adds a row to the database rather than overwriting a
+    # row as a dumb form of version control; see the Description class for more
+    # info.
     descr = models.Description(key=request.POST['key'],
                                label=request.POST['label'],
                                descr=request.POST['description'])

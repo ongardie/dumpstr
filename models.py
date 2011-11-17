@@ -39,10 +39,16 @@ class Report(models.Model):
 
 class Description(models.Model):
     """A label and a description for some key. These are stored in the database
-    so that users can modify them easily."""
+    so that users can modify them easily.
+
+    The id field is created automatically by Django. It serves as a version
+    number for rows, so the current label and description for a key can be
+    found at the row matching that key with the biggest id. This makes it easy
+    to roll back the database in case of people like Ankita defacing it.
+    """
 
     # A short, stable way to identify the label and description.
-    key = models.CharField(max_length=65535, primary_key=True)
+    key = models.CharField(max_length=65535)
 
     # A one-line, human-readable label.
     label = models.CharField(max_length=65535)
