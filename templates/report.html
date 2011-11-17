@@ -15,7 +15,7 @@ WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
 ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-This is the template for the home page.
+This is the template for the report page.
 {% endcomment %}
 
 {% block head %}
@@ -329,7 +329,8 @@ $(function() {
     };
     updateDisplay();
     compact.changes.subscribe(function() {
-        $.cookie('compact_reports', compact.get(), { expires: 365 });
+        $.cookie('compact_reports', compact.get(),
+                 { expires: 365, path: WEBMETRICS.WWW_ROOT });
         updateDisplay();
     });
 });
