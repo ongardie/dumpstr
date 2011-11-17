@@ -2,3 +2,8 @@
 *.pyc
 *.sqlite3
 /local_settings.py
+/static/admin
+/static/fancybox
+/static/flot
+/static/jquery.cookie.js
+/static/jquery.js
