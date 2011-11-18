@@ -26,6 +26,7 @@ import time
 
 from django import http
 from django.db import connection, transaction, DatabaseError
+from django.middleware import csrf
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.views.decorators.csrf import csrf_exempt
@@ -53,6 +54,10 @@ def make_trend_table_name(trend_id):
 def context_processor(request):
     """Called when each RequestContext is created to create common
     variables for templates."""
+
+    # This is a hack to get the CSRF cookie to be sent to the client on every
+    # request.
+    csrf.get_token(request)
 
     latest_reports = (models.Report.objects.values('id', 'owner', 'type')
                         .order_by('-id')[:10])
