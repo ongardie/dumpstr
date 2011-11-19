@@ -13,7 +13,7 @@
 # ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
 # SOFTWARE.
 
-# This file defines the database models used in the webmetrics application.
+# This file defines the database models used in the dumpstr application.
 
 from django.db import models
 

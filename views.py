@@ -13,7 +13,7 @@
 # ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
 # SOFTWARE.
 
-# This file contains the various views used in the webmetrics
+# This file contains the various views used in the dumpstr
 # application.
 
 from __future__ import division
@@ -48,7 +48,7 @@ def make_trend_table_name(trend_id):
 
     if re.search('^[A-Za-z0-9_]+$', trend_id) is None:
         raise ValueError('Trends must be alphanumeric: ' + trend_id)
-    return 'webmetrics_trends_' + trend_id
+    return 'dumpstr_trends_' + trend_id
 
 
 def context_processor(request):

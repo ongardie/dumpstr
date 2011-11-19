@@ -2,7 +2,7 @@
 About
 =====
 
-This is the README file for the WebMetrics project. A WebMetrics installation
+This is the README file for the dumpstr project. A dumpstr installation
 provides a place for you to upload and view simple reports.
 
 =======
@@ -30,7 +30,7 @@ Installation
 Django
 ------
 
-You need django to run webmetrics.
+You need django to run dumpstr.
 On Debian, you can install the package python-django.
 
 Static Files
@@ -86,7 +86,7 @@ To create your database, run::
 
   python manage.py syncdb
 
-WebMetrics is known to work with SQLite.
+dumpstr is known to work with SQLite.
 
 
 =================

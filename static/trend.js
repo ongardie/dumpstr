@@ -25,15 +25,15 @@
 // trendId: identifier for the trend
 // label: a label to use for the graph
 // description: a description for the graph
-WEBMETRICS.addTrendGraph = function (container, trendId,
+DUMPSTR.addTrendGraph = function (container, trendId,
                                      key, label, description) {
-    var resource = WEBMETRICS.staticResources.get('trendgraph.html');
+    var resource = DUMPSTR.staticResources.get('trendgraph.html');
     resource.whenReady(function (trendGraphTpl) {
         var cloned = $(trendGraphTpl);
         container.append(cloned);
         $("h3", cloned).html(label);
         $("span", cloned).html(description);
-        WEBMETRICS.createTrend(trendId,
+        DUMPSTR.createTrend(trendId,
                             $(".graph-placeholder", cloned),
                             $(".zoom-out", cloned),
                             $(".pointinfo-placeholder", cloned));
@@ -43,7 +43,7 @@ WEBMETRICS.addTrendGraph = function (container, trendId,
             key: key,
             label: label,
             description: description,
-            labelDescChanges: WEBMETRICS.createPublisher(),
+            labelDescChanges: DUMPSTR.createPublisher(),
         };
         descSubject.labelDescChanges.subscribe(function () {
             $("h3", cloned).html(descSubject.label);
@@ -53,14 +53,14 @@ WEBMETRICS.addTrendGraph = function (container, trendId,
         descSubject.labelDescChanges.publish();
         // And set the handler for the description edit link
         $("a", cloned).click(function() {
-            WEBMETRICS.editDescriptionAction(descSubject);
+            DUMPSTR.editDescriptionAction(descSubject);
         });
     });
 }
 
 
 // Graph a trend line.
-// This is used internally by WEBMETRICS.addTrendGraph, and you should usually
+// This is used internally by DUMPSTR.addTrendGraph, and you should usually
 // call that instead.
 //
 // trendId: identifier for the trend
@@ -70,7 +70,7 @@ WEBMETRICS.addTrendGraph = function (container, trendId,
 // back: jQuery selector result for a zoom out button.
 // pointInfo: jQuery selector result for displaying information about
 //            selected points.
-WEBMETRICS.createTrend = function (trendId, placeholder, back, pointInfo) {
+DUMPSTR.createTrend = function (trendId, placeholder, back, pointInfo) {
 
     var data = [];
     var zooms = [];
@@ -126,7 +126,7 @@ WEBMETRICS.createTrend = function (trendId, placeholder, back, pointInfo) {
             requestData.to = last[1];
         }
         $.ajax({
-            url: WEBMETRICS.WWW_ROOT + 'ajax/trend/' + trendId,
+            url: DUMPSTR.WWW_ROOT + 'ajax/trend/' + trendId,
             type: 'GET',
             data: requestData,
             dataType: 'json',
@@ -161,7 +161,7 @@ WEBMETRICS.createTrend = function (trendId, placeholder, back, pointInfo) {
         html.push(formatTimestamp(timestamp));
         html.push("Value: " + value);
         if (details[3] > 0) {
-            html.push("Report: <a href=\"" + WEBMETRICS.WWW_ROOT +
+            html.push("Report: <a href=\"" + DUMPSTR.WWW_ROOT +
                       "report/" + reportId + "\">" +
                       reportId + "</a>");
         }

@@ -27,8 +27,8 @@
 //  - description: a multi-line string
 //  - labelDescChanges: a publisher (see static/publisher.js) that is to
 //                      be called when the label and description have been changed.
-WEBMETRICS.editDescriptionAction = (function() {
-    var description_form = WEBMETRICS.staticResources.get(
+DUMPSTR.editDescriptionAction = (function() {
+    var description_form = DUMPSTR.staticResources.get(
                                 'description_form.html');
     return function (subject) {
         description_form.whenReady(function (html) {
@@ -51,7 +51,7 @@ WEBMETRICS.editDescriptionAction = (function() {
                 $.ajax({
                     type: 'POST',
                     cache: false,
-                    url: WEBMETRICS.WWW_ROOT + 'ajax/description/save/',
+                    url: DUMPSTR.WWW_ROOT + 'ajax/description/save/',
                     data: {
                         key: subject.key,
                         label: subject.label,

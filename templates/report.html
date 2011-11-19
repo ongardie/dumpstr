@@ -42,7 +42,7 @@ makeCounter = function () {
 var makeToggle = function(button, initialValue, trueLabel, falseLabel) {
     var value = initialValue;
     var that = {};
-    that.changes = WEBMETRICS.createPublisher();
+    that.changes = DUMPSTR.createPublisher();
     that.get = function () { return value; };
     that.toggle = function () { value = !value; that.changes.publish(); }
     var relabel = function() {
@@ -63,7 +63,7 @@ createSection = function(key, label, description, lines) {
         key: key,
         label: label,
         description: description,
-        labelDescChanges: WEBMETRICS.createPublisher(),
+        labelDescChanges: DUMPSTR.createPublisher(),
         lines: lines,
     };
 };
@@ -97,7 +97,7 @@ createLine = function(key, label, description, summary, data, unit) {
         key: key,
         label: label,
         description: description,
-        labelDescChanges: WEBMETRICS.createPublisher(),
+        labelDescChanges: DUMPSTR.createPublisher(),
         summary: summary,
         data: data,
         unit: unit,
@@ -215,7 +215,7 @@ addSection = function(section) {
     section.labelDescChanges.publish();
     // And set the handler for the description edit link
     $(".quiet a", sectionHtml).first().click(function() {
-        WEBMETRICS.editDescriptionAction(section);
+        DUMPSTR.editDescriptionAction(section);
     });
 
     $.each(section.lines, function (i, line) {
@@ -233,7 +233,7 @@ addSection = function(section) {
         line.labelDescChanges.publish();
         // And set the handler for the description edit link
         $(".quiet a", row).click(function() {
-            WEBMETRICS.editDescriptionAction(line);
+            DUMPSTR.editDescriptionAction(line);
         });
 
         // Fill in the remaining placeholders
@@ -302,7 +302,7 @@ $(function() {
         trendGraphsAdded = true;
         var container = $('#trendgraphs');
         {% for trend in trends %}
-        WEBMETRICS.addTrendGraph(container,
+        DUMPSTR.addTrendGraph(container,
                                  '{{ trend.id }}',
                                  '{{ trend.key }}',
                                  '{{ trend.label }}',
@@ -330,7 +330,7 @@ $(function() {
     updateDisplay();
     compact.changes.subscribe(function() {
         $.cookie('compact_reports', compact.get(),
-                 { expires: 365, path: WEBMETRICS.WWW_ROOT });
+                 { expires: 365, path: DUMPSTR.WWW_ROOT });
         updateDisplay();
     });
 });

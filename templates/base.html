@@ -31,10 +31,10 @@ throughout the site.
 
     {# The ordering for these javascript snippets and files is important and fragile. #}
     <script>
-        WEBMETRICS = {}; // namespace
-        WEBMETRICS.STATIC_URL = "{{ STATIC_URL }}";
-        WEBMETRICS.WWW_ROOT = "{{ WWW_ROOT }}";
-        WEBMETRICS.PROJECT = "{{ PROJECT }}";
+        DUMPSTR = {}; // namespace
+        DUMPSTR.STATIC_URL = "{{ STATIC_URL }}";
+        DUMPSTR.WWW_ROOT = "{{ WWW_ROOT }}";
+        DUMPSTR.PROJECT = "{{ PROJECT }}";
         $(function() {
             $('#view_report').click(function() {
                 var id = $('#view_id').val();
@@ -55,7 +55,7 @@ throughout the site.
 
     <div id="header">
         <h2 id="branding">
-            WebMetrics
+            dumpstr
             {% if PROJECT %}
               for {{ PROJECT|safe }}
             {% endif %}

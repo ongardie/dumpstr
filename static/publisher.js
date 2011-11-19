@@ -1,4 +1,4 @@
-WEBMETRICS.createPublisher = function() {
+DUMPSTR.createPublisher = function() {
     var subscribers = [];
     return {
         subscribe: function(callback) {

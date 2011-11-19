@@ -25,7 +25,7 @@ This is the template for the home page.
 $(function () {
     var container = $('#trendgraphs');
     {% for trend in trends %}
-    WEBMETRICS.addTrendGraph(container, 
+    DUMPSTR.addTrendGraph(container, 
                              '{{ trend.id }}',
                              '{{ trend.key }}',
                              '{{ trend.label }}',

@@ -1,4 +1,4 @@
-# Django settings for webmetrics project.
+# Django settings for dumpstr project.
 # Refer to https://docs.djangoproject.com/en/dev/ref/settings/ for
 # documentation.
 
@@ -11,22 +11,22 @@
 # system time zone.
 TIME_ZONE = None
 
-ROOT_URLCONF = 'webmetrics.urls'
+ROOT_URLCONF = 'dumpstr.urls'
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    '/home/webmetrics/webmetrics/templates/',
+    '/home/dumpstr/dumpstr/templates/',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.debug',
-    'webmetrics.views.context_processor',
+    'dumpstr.views.context_processor',
 )
 
 INSTALLED_APPS = (
-    'webmetrics',
+    'dumpstr',
 )
 
 # See http://docs.djangoproject.com/en/dev/topics/logging for

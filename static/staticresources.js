@@ -24,19 +24,19 @@
 //               contents of the static resource file. This function is called
 //               exactly once, either immediately if the resource has already
 //               been fetched, or once the resource has been retrieved.
-WEBMETRICS.staticResources = (function() {
+DUMPSTR.staticResources = (function() {
     var cache = {};
 
     var makeResource = function (resource_name) {
         var loading = false; // whether the AJAX request has been fired off
         var isReady = false; // whether the resource has been successfully retrieved
         var resource = ''; // a placeholder for the contents of the resource
-        var onReady = WEBMETRICS.createPublisher(); // notifies when isReady becomes true
+        var onReady = DUMPSTR.createPublisher(); // notifies when isReady becomes true
         // fire off the AJAX request
         var load = function () {
             loading = true;
             $.ajax({
-                url: WEBMETRICS.STATIC_URL + resource_name,
+                url: DUMPSTR.STATIC_URL + resource_name,
                 success: function (data) {
                     isReady = true;
                     resource = data;

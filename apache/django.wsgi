@@ -13,7 +13,7 @@
 # ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
 # SOFTWARE.
 
-# This file is called by apache to serve dynamic content from the webmetrics
+# This file is called by apache to serve dynamic content from the dumpstr
 # application. See http://code.google.com/p/modwsgi/wiki/IntegrationWithDjango
 # for more information.
 
@@ -23,12 +23,12 @@ import os
 
 parent = os.path.dirname
 
-# path should automatically point above your webmetrics root directory
+# path should automatically point above your dumpstr root directory
 path = parent(parent(parent(__file__)))
 if path not in sys.path:
     sys.path.append(path)
 
-os.environ['DJANGO_SETTINGS_MODULE'] = 'webmetrics.settings'
+os.environ['DJANGO_SETTINGS_MODULE'] = 'dumpstr.settings'
 
 _application = django.core.handlers.wsgi.WSGIHandler()
 def application(environ, start_response):

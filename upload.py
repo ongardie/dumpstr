@@ -13,7 +13,7 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 """
-A library with which to upload reports to the webmetrics tool.
+A library with which to upload reports to the dumpstr tool.
 """
 
 from __future__ import division, print_function
@@ -22,7 +22,7 @@ import json
 import os
 import urllib
 
-class WebMetrics(object):
+class Dumpstr(object):
     """
     A class for working with reports.
     """
@@ -37,7 +37,7 @@ class WebMetrics(object):
     def __init__(self, url):
         """Constructor.
 
-        url -- the base URL for the root of your  webmetrics installation
+        url -- the base URL for the root of your  dumpstr installation
         """
 
         if url.endswith('/'):
@@ -72,9 +72,9 @@ class WebMetrics(object):
 
         type -- a string identifying the type of report
         data -- the main report in a JSON-able format as described in the
-                webmetrics README
+                dumpstr README
         trends -- the trends list in a JSON-able format as described in the
-                  webmetrics README
+                  dumpstr README
         owner -- your username, defaults to the environment variable USER
         """
 
