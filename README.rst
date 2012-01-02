@@ -23,6 +23,15 @@ WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
 ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+=====
+Dumpy
+=====
+
+Dumpy is the logo for dumpstr. It was created by Matt Melvin of
+http://mattmelvin.com and is used in dumpstr with his permission. Matt would
+prefer uses of dumpy in dumpstr to link to mattmelvin.com . For more
+information, see the dumpy/README file.
+
 ============
 Installation
 ============
