@@ -14,7 +14,7 @@ if settings.DEBUG and hasattr(settings, 'STATIC_DOC_ROOT'):
 assert settings.WWW_ROOT.startswith('/')
 prefix = '^%s' % settings.WWW_ROOT[1:]
 
-urlpatterns = patterns('',
+urlpatterns += patterns('',
     url(prefix + r'$',
         'dumpstr.views.home'),
     url(prefix + r'report/(\d+)/?$',
