@@ -1,5 +1,5 @@
 {% comment %}
-Copyright (c) 2011 Stanford University
+Copyright (c) 2011-2012 Stanford University
 
 Permission to use, copy, modify, and distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -76,8 +76,20 @@ throughout the site.
 
     <div id="content">
         <div id="content-main">
+            <img src="{{ STATIC_URL }}dumpy_medium_flipped.png" style="float: right" />
             {% block content %}{% endblock %}
         </div>
+    </div>
+
+    <div id="footer">
+        <p class="small quiet" style="text-align: center">
+            This is an instance of
+            <a href="http://github.com/ongardie/dumpstr">dumpstr</a>,
+            an open-source project.
+            <br />
+            The Dumpy drawing is used with permission from
+            <a href="http://mattmelvin.com">Matt Melvin</a>.
+        </p>
     </div>
 
 </body>

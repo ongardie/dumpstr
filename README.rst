@@ -9,7 +9,7 @@ provides a place for you to upload and view simple reports.
 License
 =======
 
-Copyright (c) 2011 Stanford University
+Copyright (c) 2011-2012 Stanford University
 
 Permission to use, copy, modify, and distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
